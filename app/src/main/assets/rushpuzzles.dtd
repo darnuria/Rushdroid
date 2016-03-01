@@ -1,0 +1,10 @@
+<!ELEMENT rushpuzzles (puzzle)>
+    <!ELEMENT puzzle (piece)>
+    <!ATTLIST puzzle name CDATA #REQUIRED>
+    <!ELEMENT piece EMPTY>
+    <!ATTLIST piece
+        id ID #REQUIRED
+        len (2|3) #REQUIRED
+        dir (H|V) #REQUIRED
+        col CDATA #REQUIRED
+        lig CDATA #REQUIRED>
