@@ -20,6 +20,8 @@ import java.util.List;
 
 /**
  * Created by Corentin-Axel on 08/02/16.
+ * Classe responsible of the rendering. Use a GameThread for drawing of the UI Thread.
+ * @see GameThread
  */
 
 final public class GameView extends SurfaceView {
@@ -42,8 +44,6 @@ final public class GameView extends SurfaceView {
   public GameView(@NonNull Context context, @NonNull AttributeSet attrs) {
     super(context, attrs);
     this.context = context;
-    // TODO: petit soucis avec le XML
-//    this.bmp = BitmapFactory.decodeResource(getResources(), R.id.gameView);
 
     getHolder().addCallback(new SurfaceHolder.Callback() {
       private GameThread th;
@@ -94,7 +94,10 @@ final public class GameView extends SurfaceView {
     c.drawLine(this.X - 1, 0, this.X - 1, this.X - 1, p);
   }
 
-  // Finir ce truc.
+  /* TODO:
+  Dans l'idée cette fonction dois afficher toute les pieces d'un jeu.
+  Les Pièces sont exposées comme une collection(liste) immutable.
+   */
   private void drawGame(@NonNull Canvas c, List<Piece> gameState) {
     for (Piece p : gameState) {
       int ratioX = this.X / this.H;
@@ -122,6 +125,16 @@ final public class GameView extends SurfaceView {
     drawGame(c, ((GameApplication) context.getApplicationContext()).game().pieces(););
   }
 
+  /**
+   * @param x A position on the screen
+   * @param y A position on the screen
+   * @return A Position representing x and y on our board.
+   *
+   * Example: if we get x = 50 and y = 100 on a SurfaceView with width = 250 and height = 400
+   * And our board have a width of 5 and a height of 5.
+   * We will get a Position like this: Position { x: 1; y: 1 }
+   * @see Position
+   */
   private Position interpolation(int x, int y) {
     return new Position(x * this.H / this.X, y * this.V / this.Y);
   }
