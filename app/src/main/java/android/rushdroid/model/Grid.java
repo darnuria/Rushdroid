@@ -33,8 +33,7 @@ public class Grid implements IGrid {
   }
 
   public boolean isEmpty(@NonNull IPosition pos) {
-    // this.isIn(pos) &&
-    return ((this.get(pos) == null));
+    return this.get(pos) == null;
   }
 
   public
@@ -55,21 +54,5 @@ public class Grid implements IGrid {
   public void move(@NonNull IPosition a, @NonNull IPosition b) {
     this.set(a, this.get(b));
     this.unset(b);
-  }
-
-  @Override
-  @NonNull
-  public String toString() {
-    String s = "  0 1 2 3 4 5\n-------------\n";
-    int i = 0;
-    for (Integer[] t : this.grid) {
-      s += i + "|";
-      for (int id : t) {
-        s += " " + id;
-      }
-      i += 1;
-      s += "\n";
-    }
-    return s;
   }
 }
