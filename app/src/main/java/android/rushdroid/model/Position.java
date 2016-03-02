@@ -77,9 +77,8 @@ final public class Position implements IPosition {
   @Override
   @NonNull
   public String toString() {
-    return "{ android.rushdroid.Position col: "
-            + this.x + ", lig: "
-            + this.y
+    return "{ android.rushdroid.Position col: " + this.x
+            + ", lig: " + this.y
             + " }";
   }
 }
