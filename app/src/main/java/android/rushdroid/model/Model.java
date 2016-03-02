@@ -166,7 +166,6 @@ public class Model implements IModel {
         Position a = pos.addCol(-1);
         if (this.grid.isInX(x) && this.grid.isEmpty(a)) {
           this.grid.move(a, pos.addCol(offset));
-//        p.setPos(a);
           this.pieces.set(id, p.with_pos(a));
           return true;
         }
@@ -176,7 +175,6 @@ public class Model implements IModel {
         Position b = pos.addLig(-1);
         if (this.grid.isInY(y) && this.grid.isEmpty(b)) {
           this.grid.move(b, pos.addLig(offset));
-//        p.setPos(b);
           this.pieces.set(id, p.with_pos(b));
           return true;
         }
@@ -201,28 +199,3 @@ public class Model implements IModel {
     }
   }
 }
-/*
-  public static void main(String[] argv) {
-    final Model m = new Model("./rushpuzzles.xml");
-    System.out.println(m.endOfGame());
-    while (m.endOfGame() == false) {
-      System.out.println(m);
-      Scanner keyboard = new Scanner(System.in);
-      System.out.println("w: up; a: left; s: down; d: right");
-      String s0 = keyboard.nextLine();
-      int col = Integer.parseInt(s0);
-      s0 = keyboard.nextLine();
-      int lig = Integer.parseInt(s0);
-      int id = m.getIdByPos(new Position(lig, col));
-      System.out.println("id: " + id);
-      String s1 = keyboard.nextLine();
-      boolean dir = (0 == s1.charAt(0) ? false : true);
-      if (dir) {
-        m.moveForward(id);
-      } else {
-        m.moveBackward(id);
-      }
-    }
-  }
-  */
-

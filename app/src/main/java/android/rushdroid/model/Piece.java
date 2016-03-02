@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 public class Piece implements IPiece {
   private final int id;
   private final int size;
-  private Position p;
+  private final Position p;
   private final Direction d;
 
   /**
@@ -35,11 +35,19 @@ public class Piece implements IPiece {
    *
    * @param pos A android.rushdroid.Position should not be null.
    * @see Position
+   * @deprecated Please use Piece.with_pos(Position p) instead.
+   * This old one is dangerous in multi-threaded program.
+   * @see this.with_pos
    */
   public void setPos(@NonNull Position pos) {
-    this.p = pos;
+    //this.p = pos;
   }
 
+  /**
+   * This method return a new Piece who clone the old one except for the position.
+   * @param pos
+   * @return
+   */
   public Piece with_pos(Position pos) {
     return new Piece(this.id, this.size, this.d, pos);
   }
@@ -53,13 +61,15 @@ public class Piece implements IPiece {
   }
 
   @NonNull
-  public  Position getPos() {
+  public final Position getPos() {
     return this.p;
   }
 
-  public
-  @NonNull
-  Direction getOrientation() {
+  /**
+   * @return Return the current Orientation of a Piece.
+   * @See Direction
+   */
+  public Direction getOrientation() {
     return this.d;
   }
 

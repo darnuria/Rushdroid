@@ -19,6 +19,8 @@ public class GameActivity extends Activity {
   protected void onCreate(Bundle savedInstanceState) {
 
     Model game = ((GameApplication) this.getApplication()).game();
+    // Right now this is useless Since the game return a Immutable List of Piece.
+    /*
     Map<Position, Integer> m = new HashMap<>();
     for (int l = 0; l < 6; l++) {
       for (int c = 0; c < 6; c++) {
@@ -27,6 +29,7 @@ public class GameActivity extends Activity {
         if (i != null) { m.put(p,i); }
       }
     }
+    */
     this.game = game;
 
     super.onCreate(savedInstanceState);
@@ -34,7 +37,6 @@ public class GameActivity extends Activity {
   }
 
   public void onClickRedo(View v) {
-
     //app.game();
   }
 

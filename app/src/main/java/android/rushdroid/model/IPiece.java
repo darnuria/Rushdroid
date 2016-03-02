@@ -5,5 +5,6 @@ public interface IPiece {
   int getSize();
   Direction getOrientation();
   Position getPos();
+  @Deprecated
   void setPos(Position pos);
 }
