@@ -89,11 +89,11 @@ final public class GameView extends SurfaceView {
   private void drawGrid(Canvas c) {
     Paint p = new Paint();
     p.setColor(Color.RED);
-    int Y = this.game_height;
+    int Y = this.surface_height;
     for (int x: xs) {
       c.drawLine(x, 1, x, Y, p);
     }
-    int X = this.game_width;
+    int X = this.surface_width;
     for (int y: ys) {
       c.drawLine(1, y, X, y, p);
     }
@@ -128,8 +128,8 @@ final public class GameView extends SurfaceView {
    * @see Position
    */
   private Position interpolation(int x, int y) {
-    return new Position(x * this.surface_width / this.game_width,
-                        y * this.surface_height / this.game_height);
+    return new Position(x * this.game_width / this.surface_width,
+                        y * this.game_height / this.surface_height);
   }
 
   @Override
