@@ -13,15 +13,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
-  static String[] numbers;
   @Override
   protected void onCreate(@NonNull Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    final Model game = ((GameApplication) getApplication()).game();
+    final GameApplication game = ((GameApplication) getApplication());
 
     int size = game.size();
-    numbers = new String[size];
+    String[] numbers = new String[size];
     for (int i = 0; i < size; i += 1) {
       numbers[i] = String.valueOf(i);
     }
@@ -36,15 +35,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
       }
     });
-    //  this.setContentView(R.layout.activity_game);
   }
-
-/*  @Override
-  public boolean onCreateOptionsMenu(@NonNull Menu menu) {
-    // Inflate the menu; this adds items to the action bar if it is present.
-    getMenuInflater().inflate(R.menu.menu_main, menu);
-    return true;
-  }*/
 
   @Override
   protected void onPause() {
