@@ -34,7 +34,7 @@ final public class GameView extends SurfaceView {
   private final int[] xs = new int[game_width];
   private final int[] ys = new int[game_height];
   private final Context  context;
-  private Bitmap bitmap;
+//  private Bitmap bitmap;
 
   final private void fillArray(int[] a, int game_size, int surface_size) {
     int d = game_size / surface_size;
@@ -117,25 +117,18 @@ final public class GameView extends SurfaceView {
       int x = xp * ratioX;
       int y = yp * ratioY;
       int x2, y2;
+      int id;
 
       if (p.getOrientation() == Direction.VERTICAL) {
         x2 = (xp + 1) * ratioX;
-        y2 = (p.getPos().getLig()+ p.getSize() - 1) * ratioY;
-        if (p.getSize() == 2) {
-          bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.vertical2);
-        } else {
-          bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.vertical3);
-        }
+        y2 = (yp + p.getSize() - 1) * ratioY;
+        id = (p.getSize() == 2) ? (R.drawable.vertical2) : (R.drawable.vertical3);
       } else {
-        x2 = (p.getPos().getCol() + p.getSize() - 1) * ratioX;
-        y2 = (p.getPos().getLig() + 1) * ratioY;
-        if (p.getSize() == 2) {
-          bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.horizontal2);
-        } else {
-          bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.horizontal3);
-        }
+        x2 = (xp + p.getSize() - 1) * ratioX;
+        y2 = (yp + 1) * ratioY;
+        id = (p.getSize() == 2) ? (R.drawable.horizontal2) : (R.drawable.horizontal3);
       }
-      c.drawBitmap(bitmap, null, new RectF(x, y, x2, y2), null);
+      c.drawBitmap(BitmapFactory.decodeResource(getResources(), id), null, new RectF(x, y, x2, y2), null);
     }
     drawGrid(c);
   }
