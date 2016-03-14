@@ -155,16 +155,14 @@ final public class GameView extends SurfaceView {
             int y2 = m.get(current).getPos().getLig();
             if (y2 - p.getLig() > lg - 1) {
               m.moveForward(current);
-            }
-            if (y2 - p.getLig() < 0) {
+            } else if (y2 - p.getLig() < 0) {
               m.moveBackward(current);
             }
            } else {
             int x2 = m.get(current).getPos().getCol();
             if (x2 - p.getCol() > lg - 1) {
               m.moveForward(current);
-            }
-            if (x2 - p.getCol() < 0) {
+            } else if (x2 - p.getCol() < 0) {
               m.moveBackward(current);
             }
           }
