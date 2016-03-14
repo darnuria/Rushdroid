@@ -27,6 +27,5 @@ public class GameApplication extends Application {
     super.onCreate();
   }
 
-  public Model game() { return game;
-  }
+  public Model game() { return game; }
 }

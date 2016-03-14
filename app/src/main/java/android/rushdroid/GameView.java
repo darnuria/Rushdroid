@@ -32,6 +32,8 @@ final public class GameView extends SurfaceView {
   private final int[] xs = new int[game_width];
   private final int[] ys = new int[game_height];
   private final Context  context;
+  private Integer current = null;
+  private model m;
 
   final private void fillArray(int[] a, int game_size, int surface_size) {
     int d = game_size / surface_size;
@@ -44,6 +46,7 @@ final public class GameView extends SurfaceView {
   public GameView(@NonNull Context context, @NonNull AttributeSet attrs) {
     super(context, attrs);
     this.context = context;
+    this.m = ((GameApplication) context.getApplicationContext()).game();
 
     getHolder().addCallback(new SurfaceHolder.Callback() {
       private GameThread th;
@@ -136,17 +139,41 @@ final public class GameView extends SurfaceView {
   public boolean onTouchEvent(@NonNull MotionEvent e) {
     int x = (int) e.getX();
     int y = (int) e.getY();
+    Position p = interpolation(x, y);
 
     switch (e.getAction()) {
       case MotionEvent.ACTION_DOWN: {
-        System.out.println(interpolation(x, y));
+        // System.out.println(p);
+        current = m.getIdByPos(p);
         // TODO: Write in memory-BMP instead of in the file.
         return true;
       }
       case MotionEvent.ACTION_MOVE: {
+        if (current != null) {
+          int lg = m.get(current).getSize();
+          if (m.get(current).getOrientation() = Direction.VERTICAL) {
+            int y2 = m.get(current).getPos().getLig();
+            if (y2 - p.getLig() > lg - 1) {
+              m.moveForward(current);
+            }
+            if (y2 - p.getLig() < 0) {
+              m.moveBackward(current);
+            }
+           } else {
+            int x2 = m.get(current).getPos().getCol();
+            if (x2 - p.getCol() > lg - 1) {
+              m.moveForward(current);
+            }
+            if (x2 - p.getCol() < 0) {
+              m.moveBackward(current);
+            }
+          }
+         }
         return false;
       }
       case MotionEvent.ACTION_UP: {
+        // Si current non null : ajouter le deplacement dans la liste.
+        current = null;
         return false;
       }
       default: {
