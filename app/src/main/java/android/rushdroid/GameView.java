@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
+import android.rushdroid.model.Direction;
 import android.rushdroid.model.Model;
 import android.rushdroid.model.Piece;
 import android.rushdroid.model.Position;
@@ -32,6 +34,7 @@ final public class GameView extends SurfaceView {
   private final int[] xs = new int[game_width];
   private final int[] ys = new int[game_height];
   private final Context  context;
+//  private Bitmap bitmap;
 
   final private void fillArray(int[] a, int game_size, int surface_size) {
     int d = game_size / surface_size;
@@ -105,9 +108,29 @@ final public class GameView extends SurfaceView {
   Dans l'idée cette fonction dois afficher toute les pieces d'un jeu.
   Les Pièces sont exposées comme une collection(liste) immutable.
    */
-  private void drawGame(@NonNull Canvas c, List<Piece> gameState) {
-//    for (Piece p : gameState) {
-//    }
+  private void drawGame(@NonNull Canvas c, List<Piece> pieces) {
+    int ratioY = surface_height / game_height;
+    int ratioX = surface_width / game_width;
+    for (Piece p : pieces) {
+      int xp = p.getPos().getCol();
+      int yp = p.getPos().getLig();
+      int x = xp * ratioX;
+      int y = yp * ratioY;
+      int x2, y2;
+      int id;
+
+      if (p.getOrientation() == Direction.VERTICAL) {
+        x2 = (xp + 1) * ratioX;
+        y2 = (yp + p.getSize() - 1) * ratioY;
+        id = (p.getSize() == 2) ? (R.drawable.vertical2) : (R.drawable.vertical3);
+      } else {
+        x2 = (xp + p.getSize() - 1) * ratioX;
+        y2 = (yp + 1) * ratioY;
+        id = (p.getSize() == 2) ? (R.drawable.horizontal2) : (R.drawable.horizontal3);
+      }
+      c.drawBitmap(BitmapFactory.decodeResource(getResources(), id), null, new RectF(x, y, x2, y2), null);
+    }
+    drawGrid(c);
   }
 
   @Override
