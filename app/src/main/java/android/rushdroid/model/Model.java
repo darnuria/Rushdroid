@@ -34,6 +34,11 @@ public class Model implements IModel {
     }
   }
 
+  public @NonNull
+  Piece piece(int id) {
+    return this.pieces.get(id);
+  }
+
   public
   @Nullable
   Integer getIdByPos(@NonNull IPosition pos) {
@@ -53,7 +58,8 @@ public class Model implements IModel {
   }
 
   public boolean endOfGame() {
-    return this.grid.get(new Position(4, 2)) == 0;
+    Integer p =  this.grid.get(new Position(4, 2));
+    return p != null && p == 0;
   }
 
   public boolean moveForward(int id) {

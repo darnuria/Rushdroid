@@ -1,7 +1,6 @@
 package android.rushdroid;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -17,8 +16,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import java.io.IOError;
-import java.util.List;
+// import android.graphics.Bitmap;
 
 /**
  * Created by Corentin-Axel on 08/02/16.
@@ -34,9 +32,13 @@ final public class GameView extends SurfaceView {
   private final int[] xs = new int[game_width];
   private final int[] ys = new int[game_height];
   private final Context  context;
-//  private Bitmap bitmap;
+  private Integer current = null;
+  private int down_x;
+  private int down_y;
+  private final Model m;
+  //  private Bitmap bitmap;
 
-  final private void fillArray(int[] a, int game_size, int surface_size) {
+  private void fillArray(int[] a, int game_size, int surface_size) {
     int d = game_size / surface_size;
     a[0] = 1;
     for (int i = 1; i < a.length; i++) {
@@ -47,6 +49,7 @@ final public class GameView extends SurfaceView {
   public GameView(@NonNull Context context, @NonNull AttributeSet attrs) {
     super(context, attrs);
     this.context = context;
+    this.m = ((GameApplication) context.getApplicationContext()).game();
 
     getHolder().addCallback(new SurfaceHolder.Callback() {
       private GameThread th;
@@ -74,7 +77,6 @@ final public class GameView extends SurfaceView {
             retry = false;
           } catch (InterruptedException e) {
             // try again shutting down the thread
-            continue;
           }
         }
       }
@@ -108,7 +110,7 @@ final public class GameView extends SurfaceView {
   Dans l'idée cette fonction dois afficher toute les pieces d'un jeu.
   Les Pièces sont exposées comme une collection(liste) immutable.
    */
-  private void drawGame(@NonNull Canvas c, List<Piece> pieces) {
+  private void drawGame(@NonNull Canvas c, Iterable<Piece> pieces) {
     int ratioY = surface_height / game_height;
     int ratioX = surface_width / game_width;
     for (Piece p : pieces) {
@@ -155,24 +157,37 @@ final public class GameView extends SurfaceView {
                         y * this.game_height / this.surface_height);
   }
 
+  // Mouhahaha ternary power!
+  private boolean help_move(int down_a, int a){
+    return (down_a - a < 0) ? (m.moveForward(current)) : ((down_a - a > 0) && m.moveBackward(current));
+  }
+
   @Override
   public boolean onTouchEvent(@NonNull MotionEvent e) {
     int x = (int) e.getX();
     int y = (int) e.getY();
-
     switch (e.getAction()) {
       case MotionEvent.ACTION_DOWN: {
-        System.out.println(interpolation(x, y));
-        // TODO: Write in memory-BMP instead of in the file.
+        // System.out.println(p);
+        current = m.getIdByPos(interpolation(x, y));
+        this.down_x = x;
+        this.down_y = y;
         return true;
-      }
-      case MotionEvent.ACTION_MOVE: {
+      } case MotionEvent.ACTION_MOVE: {
         return false;
-      }
-      case MotionEvent.ACTION_UP: {
-        return false;
-      }
-      default: {
+      } case MotionEvent.ACTION_UP: {
+        boolean ret = false;
+        // Si current non null : ajouter le deplacement dans la queue.
+        if (current != null) {
+          if (m.getOrientation(current) == Direction.HORIZONTAL) {
+            ret = help_move(down_y, y);
+          } else {
+            ret = help_move(down_x, x);
+          }
+          this.current = null;
+        }
+        return ret;
+      } default: {
         return false;
       }
     }

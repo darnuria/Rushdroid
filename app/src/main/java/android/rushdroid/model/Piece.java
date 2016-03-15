@@ -2,7 +2,7 @@ package android.rushdroid.model;
 
 import android.support.annotation.NonNull;
 
-public class Piece implements IPiece {
+final public class Piece implements IPiece {
   private final int id;
   private final int size;
   private final Position p;
@@ -45,8 +45,8 @@ public class Piece implements IPiece {
 
   /**
    * This method return a new Piece who clone the old one except for the position.
-   * @param pos
-   * @return
+   * @param pos a Position for building a new class. Copy ref.
+   * @return a new Piece light copy.
    */
   public Piece with_pos(Position pos) {
     return new Piece(this.id, this.size, this.d, pos);
