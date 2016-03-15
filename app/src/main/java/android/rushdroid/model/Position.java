@@ -1,6 +1,5 @@
 package android.rushdroid.model;
 
-import android.annotation.TargetApi;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 

@@ -1,11 +1,12 @@
 package android.rushdroid;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
+import android.rushdroid.model.Direction;
 import android.rushdroid.model.Model;
 import android.rushdroid.model.Piece;
 import android.rushdroid.model.Position;
@@ -15,8 +16,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import java.io.IOError;
-import java.util.List;
+// import android.graphics.Bitmap;
 
 /**
  * Created by Corentin-Axel on 08/02/16.
@@ -33,9 +33,12 @@ final public class GameView extends SurfaceView {
   private final int[] ys = new int[game_height];
   private final Context  context;
   private Integer current = null;
-  private model m;
+  private int down_x;
+  private int down_y;
+  private final Model m;
+  //  private Bitmap bitmap;
 
-  final private void fillArray(int[] a, int game_size, int surface_size) {
+  private void fillArray(int[] a, int game_size, int surface_size) {
     int d = game_size / surface_size;
     a[0] = 1;
     for (int i = 1; i < a.length; i++) {
@@ -74,7 +77,6 @@ final public class GameView extends SurfaceView {
             retry = false;
           } catch (InterruptedException e) {
             // try again shutting down the thread
-            continue;
           }
         }
       }
@@ -108,9 +110,29 @@ final public class GameView extends SurfaceView {
   Dans l'idée cette fonction dois afficher toute les pieces d'un jeu.
   Les Pièces sont exposées comme une collection(liste) immutable.
    */
-  private void drawGame(@NonNull Canvas c, List<Piece> gameState) {
-//    for (Piece p : gameState) {
-//    }
+  private void drawGame(@NonNull Canvas c, Iterable<Piece> pieces) {
+    int ratioY = surface_height / game_height;
+    int ratioX = surface_width / game_width;
+    for (Piece p : pieces) {
+      int xp = p.getPos().getCol();
+      int yp = p.getPos().getLig();
+      int x = xp * ratioX;
+      int y = yp * ratioY;
+      int x2, y2;
+      int id;
+
+      if (p.getOrientation() == Direction.VERTICAL) {
+        x2 = (xp + 1) * ratioX;
+        y2 = (yp + p.getSize() - 1) * ratioY;
+        id = (p.getSize() == 2) ? (R.drawable.vertical2) : (R.drawable.vertical3);
+      } else {
+        x2 = (xp + p.getSize() - 1) * ratioX;
+        y2 = (yp + 1) * ratioY;
+        id = (p.getSize() == 2) ? (R.drawable.horizontal2) : (R.drawable.horizontal3);
+      }
+      c.drawBitmap(BitmapFactory.decodeResource(getResources(), id), null, new RectF(x, y, x2, y2), null);
+    }
+    drawGrid(c);
   }
 
   @Override
@@ -135,46 +157,37 @@ final public class GameView extends SurfaceView {
                         y * this.game_height / this.surface_height);
   }
 
+  // Mouhahaha ternary power!
+  private boolean help_move(int down_a, int a){
+    return (down_a - a < 0) ? (m.moveForward(current)) : ((down_a - a > 0) && m.moveBackward(current));
+  }
+
   @Override
   public boolean onTouchEvent(@NonNull MotionEvent e) {
     int x = (int) e.getX();
     int y = (int) e.getY();
-    Position p = interpolation(x, y);
-
     switch (e.getAction()) {
       case MotionEvent.ACTION_DOWN: {
         // System.out.println(p);
-        current = m.getIdByPos(p);
-        // TODO: Write in memory-BMP instead of in the file.
+        current = m.getIdByPos(interpolation(x, y));
+        this.down_x = x;
+        this.down_y = y;
         return true;
-      }
-      case MotionEvent.ACTION_MOVE: {
+      } case MotionEvent.ACTION_MOVE: {
+        return false;
+      } case MotionEvent.ACTION_UP: {
+        boolean ret = false;
+        // Si current non null : ajouter le deplacement dans la queue.
         if (current != null) {
-          int lg = m.get(current).getSize();
-          if (m.get(current).getOrientation() = Direction.VERTICAL) {
-            int y2 = m.get(current).getPos().getLig();
-            if (y2 - p.getLig() > lg - 1) {
-              m.moveForward(current);
-            } else if (y2 - p.getLig() < 0) {
-              m.moveBackward(current);
-            }
-           } else {
-            int x2 = m.get(current).getPos().getCol();
-            if (x2 - p.getCol() > lg - 1) {
-              m.moveForward(current);
-            } else if (x2 - p.getCol() < 0) {
-              m.moveBackward(current);
-            }
+          if (m.getOrientation(current) == Direction.HORIZONTAL) {
+            ret = help_move(down_y, y);
+          } else {
+            ret = help_move(down_x, x);
           }
-         }
-        return false;
-      }
-      case MotionEvent.ACTION_UP: {
-        // Si current non null : ajouter le deplacement dans la liste.
-        current = null;
-        return false;
-      }
-      default: {
+          this.current = null;
+        }
+        return ret;
+      } default: {
         return false;
       }
     }
