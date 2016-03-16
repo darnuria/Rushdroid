@@ -123,10 +123,10 @@ final public class GameView extends SurfaceView {
 
       if (p.getOrientation() == Direction.VERTICAL) {
         x2 = (xp + 1) * ratioX;
-        y2 = (yp + p.getSize() - 1) * ratioY;
+        y2 = (yp + p.getSize()) * ratioY;
         id = (p.getSize() == 2) ? (R.drawable.vertical2) : (R.drawable.vertical3);
       } else {
-        x2 = (xp + p.getSize() - 1) * ratioX;
+        x2 = (xp + p.getSize()) * ratioX;
         y2 = (yp + 1) * ratioY;
         id = (p.getSize() == 2) ? (R.drawable.horizontal2) : (R.drawable.horizontal3);
       }
