@@ -31,11 +31,12 @@ final public class GameView extends SurfaceView {
   private final int game_height = 6;
   private final int[] xs = new int[game_width];
   private final int[] ys = new int[game_height];
-  private final Context  context;
+  private final Context context;
   private Integer current = null;
   private int down_x;
   private int down_y;
   private final Model m;
+  private boolean ret;
   //  private Bitmap bitmap;
 
   private void fillArray(int[] a, int game_size, int surface_size) {
@@ -93,11 +94,11 @@ final public class GameView extends SurfaceView {
     Paint p = new Paint();
     p.setColor(Color.RED);
     int Y = this.surface_height;
-    for (int x: this.xs) {
+    for (int x : this.xs) {
       c.drawLine(x, 1, x, Y, p);
     }
     int X = this.surface_width;
-    for (int y: this.ys) {
+    for (int y : this.ys) {
       c.drawLine(1, y, X, y, p);
     }
     c.drawLine(0, Y - 1, X - 1, Y - 1, p);
@@ -158,13 +159,12 @@ final public class GameView extends SurfaceView {
    * @see Position
    */
   private Position interpolation(int x, int y) {
-    return new Position(x * this.game_width / this.surface_width,
-                        y * this.game_height / this.surface_height);
+    return new Position(x * this.game_width / this.surface_width, y * this.game_height / this.surface_height);
   }
 
-  // Mouhahaha ternary power!
+  // A lot of side effects.
   private boolean help_move(int prev, int now) {
-    return (prev <= now) ? this.m.moveForward(this.current) : this.m.moveBackward(this.current);
+    return prev <= now ? this.m.moveForward(this.current) : this.m.moveBackward(this.current);
   }
 
   @Override
@@ -178,17 +178,17 @@ final public class GameView extends SurfaceView {
         this.down_x = x;
         this.down_y = y;
         return true;
-      } case MotionEvent.ACTION_MOVE: {
-        return false;
-      } case MotionEvent.ACTION_UP: {
-        // Si current non null : ajouter le deplacement dans la queue.
-        boolean ret = false;
+      }
+      case MotionEvent.ACTION_UP: {
         if (this.current != null) {
-          ret = (m.getOrientation(current) == Direction.HORIZONTAL) ? help_move(down_y, y) : help_move(down_x, x);
+          this.ret = m.getOrientation(current) == Direction.VERTICAL
+              ? help_move(down_y, y)
+              : help_move(down_x, x);
           this.current = null;
         }
-        return ret;
-      } default: {
+        return true;
+      }
+      default: {
         return false;
       }
     }
