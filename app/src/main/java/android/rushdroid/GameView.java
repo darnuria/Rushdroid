@@ -86,8 +86,6 @@ final public class GameView extends SurfaceView {
         // Nothing to do?
       }
     });
-    // How to get access to the Application from here? :@
-    //    this.app = (GameApplication) context.getApplicationContext();
   }
 
   // Cette fonction fonctionne mais pas dans l'emulateur...
@@ -95,11 +93,11 @@ final public class GameView extends SurfaceView {
     Paint p = new Paint();
     p.setColor(Color.RED);
     int Y = this.surface_height;
-    for (int x: xs) {
+    for (int x: this.xs) {
       c.drawLine(x, 1, x, Y, p);
     }
     int X = this.surface_width;
-    for (int y: ys) {
+    for (int y: this.ys) {
       c.drawLine(1, y, X, y, p);
     }
     c.drawLine(0, Y - 1, X - 1, Y - 1, p);
@@ -111,8 +109,8 @@ final public class GameView extends SurfaceView {
   Les Pièces sont exposées comme une collection(liste) immutable.
    */
   private void drawGame(@NonNull Canvas c, Iterable<Piece> pieces) {
-    int ratioY = surface_height / game_height;
-    int ratioX = surface_width / game_width;
+    int ratioY = this.surface_height / this.game_height;
+    int ratioX = this.surface_width / this.game_width;
     for (Piece p : pieces) {
       int xp = p.getPos().getCol();
       int yp = p.getPos().getLig();
@@ -158,8 +156,8 @@ final public class GameView extends SurfaceView {
   }
 
   // Mouhahaha ternary power!
-  private boolean help_move(int down_a, int a){
-    return (down_a - a < 0) ? (m.moveForward(current)) : ((down_a - a > 0) && m.moveBackward(current));
+  private boolean help_move(int prev, int now) {
+    return (prev <= now) ? this.m.moveForward(this.current) : this.m.moveBackward(this.current);
   }
 
   @Override
@@ -169,24 +167,19 @@ final public class GameView extends SurfaceView {
     switch (e.getAction()) {
       case MotionEvent.ACTION_DOWN: {
         // System.out.println(p);
-        current = m.getIdByPos(interpolation(x, y));
+        this.current = m.getIdByPos(interpolation(x, y));
         this.down_x = x;
         this.down_y = y;
         return true;
       } case MotionEvent.ACTION_MOVE: {
         return false;
       } case MotionEvent.ACTION_UP: {
-        boolean ret = false;
         // Si current non null : ajouter le deplacement dans la queue.
-        if (current != null) {
-          if (m.getOrientation(current) == Direction.HORIZONTAL) {
-            ret = help_move(down_y, y);
-          } else {
-            ret = help_move(down_x, x);
-          }
+        if (this.current != null) {
           this.current = null;
+          return (m.getOrientation(current) == Direction.HORIZONTAL) ? help_move(down_y, y) : help_move(down_x, x);
         }
-        return ret;
+        return false;
       } default: {
         return false;
       }
