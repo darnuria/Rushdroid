@@ -57,9 +57,10 @@ public class Model implements IModel {
     return this.pieces.get(id).getPos().getCol();
   }
 
+  // TODO: Using soft-wired end-of-game position.
   public boolean endOfGame() {
-    Integer p =  this.grid.get(new Position(4, 2));
-    return p != null && p == 0;
+    Integer id =  this.grid.get(new Position(5, 2));
+    return id != null && id == 0;
   }
 
   public boolean moveForward(int id) {

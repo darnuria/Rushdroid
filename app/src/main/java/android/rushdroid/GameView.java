@@ -135,9 +135,16 @@ final public class GameView extends SurfaceView {
 
   @Override
   public void onDraw(@NonNull Canvas c) {
-    c.drawColor(Color.BLACK);
-    drawGrid(c);
-    drawGame(c, ((GameApplication) context.getApplicationContext()).game().pieces());
+    Model m = ((GameApplication) this.context.getApplicationContext()).game();
+    if (!m.endOfGame()) {
+      c.drawColor(Color.BLACK);
+      drawGrid(c);
+      drawGame(c, m.pieces());
+    } else {
+      Paint p = new Paint();
+      p.setColor(Color.RED);
+      c.drawText("Win!", 50.f, (float) this.surface_height / 2.f, p);
+    }
   }
 
   /**
