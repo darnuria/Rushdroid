@@ -175,11 +175,12 @@ final public class GameView extends SurfaceView {
         return false;
       } case MotionEvent.ACTION_UP: {
         // Si current non null : ajouter le deplacement dans la queue.
+        boolean ret = false;
         if (this.current != null) {
+          ret = (m.getOrientation(current) == Direction.HORIZONTAL) ? help_move(down_y, y) : help_move(down_x, x);
           this.current = null;
-          return (m.getOrientation(current) == Direction.HORIZONTAL) ? help_move(down_y, y) : help_move(down_x, x);
         }
-        return false;
+        return ret;
       } default: {
         return false;
       }
