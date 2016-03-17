@@ -142,9 +142,12 @@ final public class GameView extends SurfaceView {
       drawGrid(c);
       drawGame(c, m.pieces());
     } else {
+      c.drawColor(Color.BLACK);
       Paint p = new Paint();
       p.setColor(Color.RED);
-      c.drawText("Win!", 50.f, (float) this.surface_height / 2.f, p);
+      // Tout regler par rapport à la taille de l'écran.
+      p.setTextSize(100.f);
+      c.drawText("Win!", 150.f, (float) this.surface_height / 2.f, p);
     }
   }
 
