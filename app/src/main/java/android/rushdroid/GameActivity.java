@@ -17,21 +17,7 @@ public class GameActivity extends Activity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-
-    Model game = ((GameApplication) this.getApplication()).game();
-    // Right now this is useless Since the game return a Immutable List of Piece.
-    /*
-    Map<Position, Integer> m = new HashMap<>();
-    for (int l = 0; l < 6; l++) {
-      for (int c = 0; c < 6; c++) {
-        Position p = new Position(c,l);
-        Integer i = game.getIdByPos(p);
-        if (i != null) { m.put(p,i); }
-      }
-    }
-    */
-    this.game = game;
-
+    this.game = ((GameApplication) this.getApplication()).game();
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_game);
   }
