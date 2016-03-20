@@ -5,11 +5,14 @@ import android.support.annotation.Nullable;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Stack;
 
 // Todo: Using a queue for implementing a redo function.
 public class Model implements IModel {
   final private Grid grid = new Grid();
   final private List<Piece> pieces;
+  private Stack<Piece> undo = new Stack<>();
+  private Stack<Piece> redo = new Stack<>();
 
   public Model(List<Piece> pieces) {
     this.pieces = pieces;
@@ -34,10 +37,20 @@ public class Model implements IModel {
     }
   }
 
+  public void setPiece (Piece p) {
+    pieces.set(p.getId(), p);
+  }
+
   public @NonNull
   Piece piece(int id) {
     return this.pieces.get(id);
   }
+
+  public @NonNull
+  Stack<Piece> getUndo () { return undo; }
+
+  public @NonNull
+  Stack<Piece> getRedo () { return redo; }
 
   public
   @Nullable
@@ -68,6 +81,9 @@ public class Model implements IModel {
     Position pos = p.getPos();
     int size = p.getSize();
 
+    this.undo.push(p);
+    while (!redo.empty()) { redo.pop(); }
+
     switch (p.getOrientation()) {
       case HORIZONTAL: {
         int x = pos.getCol() + size;
@@ -96,6 +112,9 @@ public class Model implements IModel {
     Piece p = this.pieces.get(id);
     Position pos = p.getPos();
     int offset = p.getSize() - 1;
+
+    this.undo.push(p);
+    while (!redo.empty()) { redo.pop(); }
 
     switch (p.getOrientation()) {
       case HORIZONTAL: {
