@@ -1,6 +1,7 @@
 package android.rushdroid;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -16,8 +17,6 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-// import android.graphics.Bitmap;
-
 /**
  * Created by Corentin-Axel on 08/02/16.
  * Classe responsible of the rendering. Use a GameThread for drawing of the UI Thread.
@@ -31,14 +30,11 @@ final public class GameView extends SurfaceView {
   private final int game_height = 6;
   private final int[] xs = new int[game_width];
   private final int[] ys = new int[game_height];
-  private final Context context;
   private Integer current = null;
+  private final Model m;
+  private final Bitmap[] bitmaps = new Bitmap[4];
   private int down_x;
   private int down_y;
-  private final Model m;
-  private boolean ret;
-  //  private Bitmap bitmap;
-
   private void fillArray(int[] a, int game_size, int surface_size) {
     int d = game_size / surface_size;
     a[0] = 1;
@@ -49,7 +45,11 @@ final public class GameView extends SurfaceView {
 
   public GameView(@NonNull Context context, @NonNull AttributeSet attrs) {
     super(context, attrs);
-    this.context = context;
+
+    this.bitmaps[0] = BitmapFactory.decodeResource(getResources(), R.drawable.vertical2);
+    this.bitmaps[1] = BitmapFactory.decodeResource(getResources(), R.drawable.vertical3);
+    this.bitmaps[2] = BitmapFactory.decodeResource(getResources(), R.drawable.horizontal2);
+    this.bitmaps[3] = BitmapFactory.decodeResource(getResources(), R.drawable.horizontal3);
     this.m = ((GameApplication) context.getApplicationContext()).game();
 
     getHolder().addCallback(new SurfaceHolder.Callback() {
@@ -115,28 +115,26 @@ final public class GameView extends SurfaceView {
     for (Piece p : pieces) {
       int xp = p.getPos().getCol();
       int yp = p.getPos().getLig();
-      int x = xp * ratioX;
-      int y = yp * ratioY;
-      int x2, y2;
-      int id;
+      int x2;
+      int y2;
+      Bitmap bitmap;
 
       if (p.getOrientation() == Direction.VERTICAL) {
         x2 = (xp + 1) * ratioX;
         y2 = (yp + p.getSize()) * ratioY;
-        id = (p.getSize() == 2) ? (R.drawable.vertical2) : (R.drawable.vertical3);
+        bitmap = (p.getSize() == 2) ? (this.bitmaps[0]) : (this.bitmaps[1]);
       } else {
         x2 = (xp + p.getSize()) * ratioX;
         y2 = (yp + 1) * ratioY;
-        id = (p.getSize() == 2) ? (R.drawable.horizontal2) : (R.drawable.horizontal3);
+        bitmap = (p.getSize() == 2) ? (this.bitmaps[2]) : (this.bitmaps[3]);
       }
-      c.drawBitmap(BitmapFactory.decodeResource(getResources(), id), null, new RectF(x, y, x2, y2), null);
+      c.drawBitmap(bitmap, null, new RectF(xp * ratioX, yp * ratioY, x2, y2), null);
     }
     drawGrid(c);
   }
 
   @Override
   public void onDraw(@NonNull Canvas c) {
-    Model m = ((GameApplication) this.context.getApplicationContext()).game();
     if (!m.endOfGame()) {
       c.drawColor(Color.BLACK);
       drawGrid(c);
@@ -184,9 +182,7 @@ final public class GameView extends SurfaceView {
       }
       case MotionEvent.ACTION_UP: {
         if (this.current != null) {
-          this.ret = m.getOrientation(current) == Direction.VERTICAL
-              ? help_move(down_y, y)
-              : help_move(down_x, x);
+          if (m.getOrientation(current) == Direction.VERTICAL) { help_move(down_y, y); } else { help_move(down_x, x); }
           this.current = null;
         }
         return true;
