@@ -11,7 +11,7 @@ import org.xml.sax.SAXException;
 import java.io.IOError;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+// TODO: use it for saving import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +41,7 @@ public final class ModelXML {
     int len = Integer.parseInt(attr.getNamedItem("len").getTextContent());
     int col = Integer.parseInt(attr.getNamedItem("col").getTextContent());
     int lig = Integer.parseInt(attr.getNamedItem("lig").getTextContent());
-    return (new Piece(id, len, dir, col, lig));
+    return new Piece(id, len, dir, col, lig);
   }
 
   public List<Model> read(@NonNull InputStream is) {
@@ -55,12 +55,9 @@ public final class ModelXML {
     return ms;
   }
 
-
-  /**
-   * Not Implemented yet.
-   */
+/* TODO: Implement this for saving.
   public void write(@NonNull OutputStream os) { }
-
+*/
 
   // TODO: Managing error.
   @NonNull

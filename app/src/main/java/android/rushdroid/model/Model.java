@@ -12,14 +12,16 @@ import java.util.List;
 public class Model implements IModel {
   final private Grid grid = new Grid();
   final private List<Piece> pieces;
-  private final Deque<Piece> undo = new ArrayDeque<>();
-  private final Deque<Piece> redo = new ArrayDeque<>();
+  final private Deque<Piece> undo = new ArrayDeque<>();
+  final private Deque<Piece> redo = new ArrayDeque<>();
 
-  public Model(List<Piece> pieces) {
+
+  public Model(@NonNull List<Piece> pieces) {
     this.pieces = pieces;
     this.setAllPieces();
   }
 
+  @NonNull
   public final List<Piece> pieces() {
     return Collections.unmodifiableList(this.pieces);
   }
@@ -39,7 +41,7 @@ public class Model implements IModel {
   }
 
   public void setPiece (Piece p) {
-    pieces.set(p.getId(), p);
+    this.pieces.set(p.getId(), p);
   }
 
   public @NonNull
@@ -48,29 +50,29 @@ public class Model implements IModel {
   }
 
   public void clear () {
-    while (!undo.isEmpty()) {
-      undo();
+    while (!this.undo.isEmpty()) {
+      this.undo();
     }
-    redo.clear();
+    this.redo.clear();
   }
 
   public void undo () {
-    if (!undo.isEmpty()) {
-      Piece p1 = undo.pop();
-      Piece p2 = piece(p1.getId());
-      changeGrid(p2, p1);
-      redo.push(p2);
-      setPiece(p1);
+    if (!this.undo.isEmpty()) {
+      Piece p1 = this.undo.pop();
+      Piece p2 = this.piece(p1.getId());
+      this.changeGrid(p2, p1);
+      this.redo.push(p2);
+      this.setPiece(p1);
     }
   }
 
   public void redo () {
-    if (!redo.isEmpty()) {
-      Piece p1 = redo.pop();
-      Piece p2 = piece(p1.getId());
-      changeGrid(p2, p1);
-      undo.push(p2);
-      setPiece(p1);
+    if (!this.redo.isEmpty()) {
+      Piece p1 = this.redo.pop();
+      Piece p2 = this.piece(p1.getId());
+      this.changeGrid(p2, p1);
+      this.undo.push(p2);
+      this.setPiece(p1);
     }
   }
 
@@ -89,16 +91,16 @@ public class Model implements IModel {
     Position x = p.getPos();
     for (int i = 0; i < p.getSize(); i += 1) {
       if (p.getOrientation() == Direction.HORIZONTAL) {
-        grid.set(x.addCol(i), p.getId());
+        this.grid.set(x.addCol(i), p.getId());
       } else {
-        grid.set(x.addLig(i), p.getId());
+        this.grid.set(x.addLig(i), p.getId());
       }
     }
   }
 
   private void changeGrid (Piece remove, Piece set) {
-    removePiece(remove);
-    putPiece(set);
+    this.removePiece(remove);
+    this.putPiece(set);
   }
 
   public
@@ -121,7 +123,7 @@ public class Model implements IModel {
 
   // TODO: Using soft-wired end-of-game position.
   public boolean endOfGame() {
-    Integer id =  this.grid.get(new Position(5, 2));
+    Integer id = this.grid.get(new Position(5, 2));
     return id != null && id == 0;
   }
 
