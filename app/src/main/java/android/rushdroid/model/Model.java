@@ -3,16 +3,17 @@ package android.rushdroid.model;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.ArrayDeque;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.List;
-import java.util.Stack;
 
 // Todo: Using a queue for implementing a redo function.
 public class Model implements IModel {
   final private Grid grid = new Grid();
   final private List<Piece> pieces;
-  private Stack<Piece> undo = new Stack<>();
-  private Stack<Piece> redo = new Stack<>();
+  private final Deque<Piece> undo = new ArrayDeque<>();
+  private final Deque<Piece> redo = new ArrayDeque<>();
 
   public Model(List<Piece> pieces) {
     this.pieces = pieces;
@@ -46,11 +47,59 @@ public class Model implements IModel {
     return this.pieces.get(id);
   }
 
-  public @NonNull
-  Stack<Piece> getUndo () { return undo; }
+  public void clear () {
+    while (!undo.isEmpty()) {
+      undo();
+    }
+    redo.clear();
+  }
 
-  public @NonNull
-  Stack<Piece> getRedo () { return redo; }
+  public void undo () {
+    if (!undo.isEmpty()) {
+      Piece p1 = undo.pop();
+      Piece p2 = piece(p1.getId());
+      changeGrid(p2, p1);
+      redo.push(p2);
+      setPiece(p1);
+    }
+  }
+
+  public void redo () {
+    if (!redo.isEmpty()) {
+      Piece p1 = redo.pop();
+      Piece p2 = piece(p1.getId());
+      changeGrid(p2, p1);
+      undo.push(p2);
+      setPiece(p1);
+    }
+  }
+
+  private void removePiece (Piece p) {
+    Position x = p.getPos();
+    for (int i = 0; i < p.getSize(); i += 1) {
+      if (p.getOrientation() == Direction.HORIZONTAL) {
+        grid.set(x.addCol(i), null);
+      } else {
+        grid.set(x.addLig(i), null);
+      }
+    }
+  }
+
+  private void putPiece (Piece p) {
+    Position x = p.getPos();
+    for (int i = 0; i < p.getSize(); i += 1) {
+      if (p.getOrientation() == Direction.HORIZONTAL) {
+        grid.set(x.addCol(i), p.getId());
+      } else {
+        grid.set(x.addLig(i), p.getId());
+      }
+    }
+  }
+
+  private void changeGrid (Piece remove, Piece set) {
+    removePiece(remove);
+    putPiece(set);
+  }
 
   public
   @Nullable
@@ -82,7 +131,7 @@ public class Model implements IModel {
     int size = p.getSize();
 
     this.undo.push(p);
-    while (!redo.empty()) { redo.pop(); }
+    while (!redo.isEmpty()) { redo.pop(); }
 
     switch (p.getOrientation()) {
       case HORIZONTAL: {
@@ -114,7 +163,7 @@ public class Model implements IModel {
     int offset = p.getSize() - 1;
 
     this.undo.push(p);
-    while (!redo.empty()) { redo.pop(); }
+    while (!redo.isEmpty()) { redo.pop(); }
 
     switch (p.getOrientation()) {
       case HORIZONTAL: {
