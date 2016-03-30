@@ -6,8 +6,10 @@ import android.rushdroid.model.Model;
 import android.view.View;
 
 
+// TODO: Add managing of pause etc...
 /**
  * Created by 3300602 on 10/02/16.
+ * Manage the Game activity itself.
  */
 public class GameActivity extends Activity {
   Model game;

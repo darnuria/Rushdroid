@@ -35,6 +35,7 @@ final public class GameView extends SurfaceView {
   private final Bitmap[] bitmaps = new Bitmap[4];
   private int down_x;
   private int down_y;
+
   private void fillArray(int[] a, int game_size, int surface_size) {
     int d = game_size / surface_size;
     a[0] = 1;
@@ -89,7 +90,6 @@ final public class GameView extends SurfaceView {
     });
   }
 
-  // Cette fonction fonctionne mais pas dans l'emulateur...
   private void drawGrid(Canvas c) {
     Paint p = new Paint();
     p.setColor(Color.RED);
@@ -105,9 +105,10 @@ final public class GameView extends SurfaceView {
     c.drawLine(X - 1, 0, X - 1, X - 1, p);
   }
 
-  /* TODO:
-  Dans l'idée cette fonction dois afficher toute les pieces d'un jeu.
-  Les Pièces sont exposées comme une collection(liste) immutable.
+  /**
+   * This function draw all the game state for each frame.
+   * It will be called from the game thread.
+   * @param c Canvas
    */
   private void drawGame(@NonNull Canvas c, Iterable<Piece> pieces) {
     int ratioY = this.surface_height / this.game_height;
@@ -115,20 +116,18 @@ final public class GameView extends SurfaceView {
     for (Piece p : pieces) {
       int xp = p.getPos().getCol();
       int yp = p.getPos().getLig();
-      int x2;
-      int y2;
-      Bitmap bitmap;
 
       if (p.getOrientation() == Direction.VERTICAL) {
-        x2 = (xp + 1) * ratioX;
-        y2 = (yp + p.getSize()) * ratioY;
-        bitmap = (p.getSize() == 2) ? (this.bitmaps[0]) : (this.bitmaps[1]);
+        int x2 = (xp + 1) * ratioX;
+        int y2 = (yp + p.getSize()) * ratioY;
+        Bitmap bitmap = (p.getSize() == 2) ? (this.bitmaps[0]) : (this.bitmaps[1]);
+        c.drawBitmap(bitmap, null, new RectF(xp * ratioX, yp * ratioY, x2, y2), null);
       } else {
-        x2 = (xp + p.getSize()) * ratioX;
-        y2 = (yp + 1) * ratioY;
-        bitmap = (p.getSize() == 2) ? (this.bitmaps[2]) : (this.bitmaps[3]);
+        int x2 = (xp + p.getSize()) * ratioX;
+        int y2 = (yp + 1) * ratioY;
+        Bitmap bitmap = (p.getSize() == 2) ? (this.bitmaps[2]) : (this.bitmaps[3]);
+        c.drawBitmap(bitmap, null, new RectF(xp * ratioX, yp * ratioY, x2, y2), null);
       }
-      c.drawBitmap(bitmap, null, new RectF(xp * ratioX, yp * ratioY, x2, y2), null);
     }
     drawGrid(c);
   }
@@ -141,9 +140,8 @@ final public class GameView extends SurfaceView {
       drawGame(c, m.pieces());
     } else {
       c.drawColor(Color.BLACK);
-      Paint p = new Paint();
-      p.setColor(Color.RED);
-      // Tout regler par rapport à la taille de l'écran.
+      Paint p = new Paint(Color.RED);
+      // TODO: Tout regler par rapport à la taille de l'écran.
       p.setTextSize(100.f);
       c.drawText("Win!", 150.f, (float) this.surface_height / 2.f, p);
     }
@@ -174,7 +172,6 @@ final public class GameView extends SurfaceView {
     int y = (int) e.getY();
     switch (e.getAction()) {
       case MotionEvent.ACTION_DOWN: {
-        // System.out.println(p);
         this.current = m.getIdByPos(interpolation(x, y));
         this.down_x = x;
         this.down_y = y;
