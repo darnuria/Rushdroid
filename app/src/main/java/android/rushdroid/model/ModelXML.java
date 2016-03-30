@@ -41,7 +41,7 @@ public final class ModelXML {
     int len = Integer.parseInt(attr.getNamedItem("len").getTextContent());
     int col = Integer.parseInt(attr.getNamedItem("col").getTextContent());
     int lig = Integer.parseInt(attr.getNamedItem("lig").getTextContent());
-    return (new Piece(id, len, dir, col, lig));
+    return new Piece(id, len, dir, col, lig);
   }
 
   public List<Model> read(@NonNull InputStream is) {
