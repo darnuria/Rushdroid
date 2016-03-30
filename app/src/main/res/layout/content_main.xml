@@ -12,22 +12,22 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".MainActivity">
 
-    <TextView
+   <!-- <TextView
         android:id="@+id/title"
         android:textSize="30sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:text="XML le Lisp des 1990&apos;" />
+        android:text="XML le Lisp des 1990&apos;" /> -->
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/buttonNew"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
         android:layout_marginTop="33dp"
         android:weightSum="1">
 
@@ -43,37 +43,6 @@
             android:stretchMode="columnWidth"
             android:gravity="center"
             />
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.14"
-            android:weightSum="1">
-    <!--
-            <Button
-                android:id="@+id/buttonNew"
-                android:onClick="onClickNew"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="New Game"
-                android:background="#0f0"
-                android:layout_marginLeft="0dp"
-                android:layout_marginTop="0dp"
-                ></Button>
-                -->
-
-            <Button
-                android:id="@+id/buttonQuit"
-                android:onClick="onClickExit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Quit"
-                android:layout_marginLeft="176dp"
-                android:layout_marginTop="0dp"
-                android:layout_weight="0.17"></Button>
-
-        </LinearLayout>
 
     </LinearLayout>
 
