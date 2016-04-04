@@ -33,6 +33,7 @@ final public class GameView extends SurfaceView {
   private Integer current = null;
   private final Model m;
   private final Bitmap[] bitmaps = new Bitmap[4];
+  private Piece down_p = null;
   private int down_x;
   private int down_y;
 
@@ -162,10 +163,12 @@ final public class GameView extends SurfaceView {
     return new Position(x * this.game_width / this.surface_width, y * this.game_height / this.surface_height);
   }
 
+  /*
   // A lot of side effects.
   private boolean help_move(int prev, int now) {
     return prev <= now ? this.m.moveForward(this.current) : this.m.moveBackward(this.current);
   }
+  */
 
   @Override
   public boolean onTouchEvent(@NonNull MotionEvent e) {
@@ -173,14 +176,48 @@ final public class GameView extends SurfaceView {
     int y = (int) e.getY();
     switch (e.getAction()) {
       case MotionEvent.ACTION_DOWN: {
-        this.current = m.getIdByPos(interpolation(x, y));
-        this.down_x = x;
-        this.down_y = y;
+        // System.out.println(p);
+        Position p = interpolation(x, y);
+        this.current = m.getIdByPos(p);
+        this.down_x = p.getCol();
+        this.down_y = p.getLig();
+        if (current != null) {
+          this.down_p = m.piece(current);
+        }
+        return true;
+      }
+      case MotionEvent.ACTION_MOVE: {
+        if (this.current != null) {
+          if (m.getOrientation(current) == Direction.VERTICAL) {
+            int test = interpolation(x, y).getLig();
+            if (down_y < test) {
+              if (this.m.moveForward(this.current)) { down_y += 1; }
+            } else {
+              if (down_y > test) {
+                if (this.m.moveBackward(this.current)) { down_y -= 1; }
+              }
+            }
+          } else {
+            int test = interpolation(x, y).getCol();
+            if (down_x < test) {
+              if (this.m.moveForward(this.current)) { down_x += 1; }
+            } else {
+              if (down_x > test) {
+                if (this.m.moveBackward(this.current)) { down_x -= 1; }
+              }
+            }
+          }
+        }
         return true;
       }
       case MotionEvent.ACTION_UP: {
         if (this.current != null) {
-          if (m.getOrientation(current) == Direction.VERTICAL) { help_move(down_y, y); } else { help_move(down_x, x); }
+          if (down_p.getPos().getCol() != m.piece(current).getPos().getCol()
+                  || down_p.getPos().getLig() != m.piece(current).getPos().getLig()) {
+            this.m.undoPush(down_p);
+            this.m.redoClear();
+            this.down_p = null;
+          }
           this.current = null;
         }
         return true;
