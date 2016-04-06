@@ -64,7 +64,7 @@ final public class GameView extends SurfaceView {
         surface_height = GameView.this.getHeight();
         fillArray(xs, surface_width, game_width);
         fillArray(ys, surface_height, game_height);
-        this.th.setRunning(true);
+        this.th.setOn();
         this.th.start();
       }
 
@@ -72,7 +72,7 @@ final public class GameView extends SurfaceView {
       public void surfaceDestroyed(@NonNull SurfaceHolder h) {
         // tell the thread to shut down and wait for it to finish
         // this is a clean shutdown
-        this.th.setRunning(false);
+        this.th.setOff();
         boolean retry = true;
         while (retry) {
           try {
@@ -114,20 +114,19 @@ final public class GameView extends SurfaceView {
   private void drawGame(@NonNull Canvas c, Iterable<Piece> pieces) {
     int ratioY = this.surface_height / this.game_height;
     int ratioX = this.surface_width / this.game_width;
-    for (Piece p : pieces) {
-      int xp = p.getPos().getCol();
-      int yp = p.getPos().getLig();
-
-      if (p.getOrientation() == Direction.VERTICAL) {
-        int x2 = (xp + 1) * ratioX;
-        int y2 = (yp + p.getSize()) * ratioY;
-        Bitmap bitmap = (p.getSize() == 2) ? (this.bitmaps[0]) : (this.bitmaps[1]);
-        c.drawBitmap(bitmap, null, new RectF(xp * ratioX, yp * ratioY, x2, y2), null);
+    for (Piece piece : pieces) {
+      Position p = piece.getPos();
+      int size = piece.getSize();
+      if (piece.getOrientation() == Direction.VERTICAL) {
+        int x2 = (p.x + 1) * ratioX;
+        int y2 = (p.y + size) * ratioY;
+        Bitmap bitmap = (size == 2) ? (this.bitmaps[0]) : (this.bitmaps[1]);
+        c.drawBitmap(bitmap, null, new RectF(p.x * ratioX, p.y * ratioY, x2, y2), null);
       } else {
-        int x2 = (xp + p.getSize()) * ratioX;
-        int y2 = (yp + 1) * ratioY;
-        Bitmap bitmap = (p.getSize() == 2) ? (this.bitmaps[2]) : (this.bitmaps[3]);
-        c.drawBitmap(bitmap, null, new RectF(xp * ratioX, yp * ratioY, x2, y2), null);
+        int x2 = (p.x + size) * ratioX;
+        int y2 = (p.y + 1) * ratioY;
+        Bitmap bitmap = (size == 2) ? (this.bitmaps[2]) : (this.bitmaps[3]);
+        c.drawBitmap(bitmap, null, new RectF(p.x * ratioX, p.y * ratioY, x2, y2), null);
       }
     }
     drawGrid(c);
@@ -170,6 +169,12 @@ final public class GameView extends SurfaceView {
   }
   */
 
+  int help_move(int current, int test) {
+    if (current < test && this.m.moveForward(this.current)) { return current + 1; }
+    else if (current > test && this.m.moveBackward(this.current)) { return current - 1; }
+    else { return current; }
+  }
+
   @Override
   public boolean onTouchEvent(@NonNull MotionEvent e) {
     int x = (int) e.getX();
@@ -179,41 +184,25 @@ final public class GameView extends SurfaceView {
         // System.out.println(p);
         Position p = interpolation(x, y);
         this.current = m.getIdByPos(p);
-        this.down_x = p.getCol();
-        this.down_y = p.getLig();
-        if (current != null) {
-          this.down_p = m.piece(current);
+        if (this.current != null) {
+          this.down_p = m.piece(this.current);
+          this.down_x = p.x;
+          this.down_y = p.y;
         }
         return true;
-      }
-      case MotionEvent.ACTION_MOVE: {
+      } case MotionEvent.ACTION_MOVE: {
         if (this.current != null) {
+          Position p = interpolation(x, y);
           if (m.getOrientation(current) == Direction.VERTICAL) {
-            int test = interpolation(x, y).getLig();
-            if (down_y < test) {
-              if (this.m.moveForward(this.current)) { down_y += 1; }
-            } else {
-              if (down_y > test) {
-                if (this.m.moveBackward(this.current)) { down_y -= 1; }
-              }
-            }
+            this.down_y = this.help_move(down_y, p.y);
           } else {
-            int test = interpolation(x, y).getCol();
-            if (down_x < test) {
-              if (this.m.moveForward(this.current)) { down_x += 1; }
-            } else {
-              if (down_x > test) {
-                if (this.m.moveBackward(this.current)) { down_x -= 1; }
-              }
-            }
+            this.down_x = this.help_move(down_x, p.x);
           }
         }
         return true;
-      }
-      case MotionEvent.ACTION_UP: {
+      } case MotionEvent.ACTION_UP: {
         if (this.current != null) {
-          if (down_p.getPos().getCol() != m.piece(current).getPos().getCol()
-                  || down_p.getPos().getLig() != m.piece(current).getPos().getLig()) {
+          if (!down_p.getPos().equals(m.piece(current).getPos())) {
             this.m.undoPush(down_p);
             this.m.redoClear();
             this.down_p = null;

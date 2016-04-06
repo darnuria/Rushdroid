@@ -13,6 +13,7 @@ class GameThread extends Thread {
   final private GameView view;
   final private SurfaceHolder holder;
   private boolean running = false;
+  private boolean work = false;
 
   public GameThread(GameView view, SurfaceHolder holder) {
     this.view = view;
@@ -20,8 +21,12 @@ class GameThread extends Thread {
   }
 
   // flag to hold game state
-  protected void setRunning(boolean running) {
-    this.running = running;
+  protected void setOff() {
+    this.running = false;
+  }
+
+  protected void setOn() {
+    this.running = true;
   }
 
   /**
@@ -46,7 +51,7 @@ class GameThread extends Thread {
         }
       }
       try {
-        Thread.sleep(600);
+        Thread.sleep(100);
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
