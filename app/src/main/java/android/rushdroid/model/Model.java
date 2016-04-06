@@ -15,7 +15,6 @@ public class Model implements IModel {
   final private Deque<Piece> undo = new ArrayDeque<>();
   final private Deque<Piece> redo = new ArrayDeque<>();
 
-
   public Model(@NonNull List<Piece> pieces) {
     this.pieces = pieces;
     this.setAllPieces();
@@ -121,6 +120,10 @@ public class Model implements IModel {
     return this.pieces.get(id).getPos().getCol();
   }
 
+  public void undoPush (Piece p) { undo.push(p); }
+
+  public void redoClear () { redo.clear(); }
+
   // TODO: Using soft-wired end-of-game position.
   public boolean endOfGame() {
     Integer id = this.grid.get(new Position(5, 2));
@@ -131,9 +134,6 @@ public class Model implements IModel {
     Piece p = this.pieces.get(id);
     Position pos = p.getPos();
     int size = p.getSize();
-
-    this.undo.push(p);
-    while (!redo.isEmpty()) { redo.pop(); }
 
     switch (p.getOrientation()) {
       case HORIZONTAL: {
@@ -163,9 +163,6 @@ public class Model implements IModel {
     Piece p = this.pieces.get(id);
     Position pos = p.getPos();
     int offset = p.getSize() - 1;
-
-    this.undo.push(p);
-    while (!redo.isEmpty()) { redo.pop(); }
 
     switch (p.getOrientation()) {
       case HORIZONTAL: {

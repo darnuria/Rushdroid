@@ -14,7 +14,6 @@ import android.view.View;
 public class GameActivity extends Activity {
   Model game;
 
-
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     this.game = ((GameApplication) this.getApplication()).game();

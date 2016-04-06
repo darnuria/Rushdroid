@@ -4,8 +4,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 final public class Position implements IPosition {
-  private final int x;
-  private final int y;
+  public final int x;
+  public final int y;
 
   /**
    * @param x An integer
@@ -63,7 +63,6 @@ final public class Position implements IPosition {
   public boolean equals(@Nullable Object o) {
     if (this == o) { return true; }
     if (o == null || this.getClass() != o.getClass()) { return false; }
-
     Position p = (Position) o;
     return this.x == p.x && this.y == p.y;
   }
