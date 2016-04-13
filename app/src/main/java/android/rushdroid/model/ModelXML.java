@@ -11,7 +11,6 @@ import org.xml.sax.SAXException;
 import java.io.IOError;
 import java.io.IOException;
 import java.io.InputStream;
-// TODO: use it for saving import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +21,6 @@ import javax.xml.parsers.ParserConfigurationException;
 public final class ModelXML {
   private List<Piece> construct_puzzle(Node puzzle) {
     List<Piece> l = new ArrayList<>();
-
     if (puzzle.getNodeType() != Node.TEXT_NODE) {
       NodeList pieces = puzzle.getChildNodes();
       for (int j = 0; j < pieces.getLength(); j++) {
@@ -55,17 +53,12 @@ public final class ModelXML {
     return ms;
   }
 
-/* TODO: Implement this for saving.
-  public void write(@NonNull OutputStream os) { }
-*/
-
-  // TODO: Managing error.
   @NonNull
   private Document readXMLFile(@NonNull InputStream is) {
     try {
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       //factory.setValidating(true); // Not working on Android...
-      //factory.setNamespaceAware(false);
+      //factory.setNamespaceAware(false); Bug on Android
       DocumentBuilder builder = factory.newDocumentBuilder();
       return builder.parse(is);
     } catch (@NonNull ParserConfigurationException | IOException | SAXException e) {
@@ -83,7 +76,7 @@ public final class ModelXML {
         return Direction.VERTICAL;
       }
       default: {
-        throw new Error(new Exception("H or V Understand? See DTD!"));
+        throw new Error(new Exception("H or V"));
       }
     }
   }

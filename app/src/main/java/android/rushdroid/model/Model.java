@@ -8,13 +8,12 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 
-// Todo: Using a queue for implementing a redo function.
 public class Model implements IModel {
+  final private static Position END = new Position(5, 2);
   final private Grid grid = new Grid();
   final private List<Piece> pieces;
   final private Deque<Piece> undo = new ArrayDeque<>();
   final private Deque<Piece> redo = new ArrayDeque<>();
-
 
   public Model(@NonNull List<Piece> pieces) {
     this.pieces = pieces;
@@ -80,9 +79,9 @@ public class Model implements IModel {
     Position x = p.getPos();
     for (int i = 0; i < p.getSize(); i += 1) {
       if (p.getOrientation() == Direction.HORIZONTAL) {
-        grid.set(x.addCol(i), null);
+        grid.unset(x.addCol(i));
       } else {
-        grid.set(x.addLig(i), null);
+        grid.unset(x.addLig(i));
       }
     }
   }
@@ -121,9 +120,12 @@ public class Model implements IModel {
     return this.pieces.get(id).getPos().getCol();
   }
 
-  // TODO: Using soft-wired end-of-game position.
+  public void undoPush (Piece p) { undo.push(p); }
+
+  public void redoClear () { redo.clear(); }
+
   public boolean endOfGame() {
-    Integer id = this.grid.get(new Position(5, 2));
+    Integer id = this.grid.get(END);
     return id != null && id == 0;
   }
 
@@ -131,9 +133,6 @@ public class Model implements IModel {
     Piece p = this.pieces.get(id);
     Position pos = p.getPos();
     int size = p.getSize();
-
-    this.undo.push(p);
-    while (!redo.isEmpty()) { redo.pop(); }
 
     switch (p.getOrientation()) {
       case HORIZONTAL: {
@@ -163,9 +162,6 @@ public class Model implements IModel {
     Piece p = this.pieces.get(id);
     Position pos = p.getPos();
     int offset = p.getSize() - 1;
-
-    this.undo.push(p);
-    while (!redo.isEmpty()) { redo.pop(); }
 
     switch (p.getOrientation()) {
       case HORIZONTAL: {

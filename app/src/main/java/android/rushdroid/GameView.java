@@ -33,6 +33,7 @@ final public class GameView extends SurfaceView {
   private Integer current = null;
   private final Model m;
   private final Bitmap[] bitmaps = new Bitmap[6];
+  private Piece down_p = null;
   private int down_x;
   private int down_y;
 
@@ -65,7 +66,7 @@ final public class GameView extends SurfaceView {
         surface_height = GameView.this.getHeight();
         fillArray(xs, surface_width, game_width);
         fillArray(ys, surface_height, game_height);
-        this.th.setRunning(true);
+        this.th.setOn();
         this.th.start();
       }
 
@@ -73,7 +74,7 @@ final public class GameView extends SurfaceView {
       public void surfaceDestroyed(@NonNull SurfaceHolder h) {
         // tell the thread to shut down and wait for it to finish
         // this is a clean shutdown
-        this.th.setRunning(false);
+        this.th.setOff();
         boolean retry = true;
         while (retry) {
           try {
@@ -117,20 +118,20 @@ final public class GameView extends SurfaceView {
   private void drawGame(@NonNull Canvas c, Iterable<Piece> pieces) {
     int ratioY = this.surface_height / this.game_height;
     int ratioX = this.surface_width / this.game_width;
-    for (Piece p : pieces) {
-      int xp = p.getPos().getCol();
-      int yp = p.getPos().getLig();
+    for (Piece piece : pieces) {
+      Position p = piece.getPos();
+      int size = piece.getSize();
 
-      if (p.getOrientation() == Direction.VERTICAL) {
-        int x2 = (xp + 1) * ratioX;
-        int y2 = (yp + p.getSize()) * ratioY;
-        Bitmap bitmap = (p.getSize() == 2) ? (this.bitmaps[0]) : (this.bitmaps[1]);
-        c.drawBitmap(bitmap, null, new RectF(xp * ratioX + 1, yp * ratioY + 1, x2, y2), null);
+      if (piece.getOrientation() == Direction.VERTICAL) {
+        int x2 = (p.x + 1) * ratioX;
+        int y2 = (p.y + size) * ratioY;
+        Bitmap bitmap = (size == 2) ? (this.bitmaps[0]) : (this.bitmaps[1]);
+        c.drawBitmap(bitmap, null, new RectF(p.x * ratioX + 1, p.y * ratioY + 1, x2, y2), null);
       } else {
-        int x2 = (xp + p.getSize()) * ratioX;
-        int y2 = (yp + 1) * ratioY;
-        Bitmap bitmap = (p.getSize() == 2) ? (help_draw(p.getId())) : (this.bitmaps[3]);
-        c.drawBitmap(bitmap, null, new RectF(xp * ratioX + 1, yp * ratioY + 2, x2, y2), null);
+        int x2 = (p.x + size) * ratioX;
+        int y2 = (p.y + 1) * ratioY;
+        Bitmap bitmap = (size == 2) ? (help_draw(piece.getId())) : (this.bitmaps[3]);
+        c.drawBitmap(bitmap, null, new RectF(p.x * ratioX + 1, p.y * ratioY + 2, x2, y2), null);
       }
     }
   }
@@ -160,13 +161,54 @@ final public class GameView extends SurfaceView {
    * We will get a Position like this: Position { x: 1; y: 1 }
    * @see Position
    */
-  private Position interpolation(int x, int y) {
-    return new Position(x * this.game_width / this.surface_width, y * this.game_height / this.surface_height);
+  private Position scale(int x, int y) {
+    return new Position(x * this.game_width / this.surface_width,
+            y * this.game_height / this.surface_height);
   }
 
+  /*
   // A lot of side effects.
   private boolean help_move(int prev, int now) {
     return prev <= now ? this.m.moveForward(this.current) : this.m.moveBackward(this.current);
+  }
+  */
+
+  int help_move(int current, int test) {
+    if (current < test && this.m.moveForward(this.current)) { return current + 1; }
+    else if (current > test && this.m.moveBackward(this.current)) { return current - 1; }
+    else { return current; }
+  }
+
+  private void onDown(int x, int y) {
+    Position p = scale(x, y);
+    this.current = this.m.getIdByPos(p);
+    if (this.current != null) {
+      this.down_p = m.piece(this.current);
+      this.down_x = p.x;
+      this.down_y = p.y;
+    }
+  }
+
+  private void onMove(int x, int y) {
+    if (this.current != null) {
+      Position p = scale(x, y);
+      if (m.getOrientation(current) == Direction.VERTICAL) {
+        this.down_y = this.help_move(down_y, p.y);
+      } else {
+        this.down_x = this.help_move(down_x, p.x);
+      }
+    }
+  }
+
+  private void onUp() {
+    if (this.current != null) {
+      if (!down_p.getPos().equals(m.piece(current).getPos())) {
+        this.m.undoPush(down_p);
+        this.m.redoClear();
+        this.down_p = null;
+      }
+      this.current = null;
+    }
   }
 
   @Override
@@ -175,16 +217,14 @@ final public class GameView extends SurfaceView {
     int y = (int) e.getY();
     switch (e.getAction()) {
       case MotionEvent.ACTION_DOWN: {
-        this.current = m.getIdByPos(interpolation(x, y));
-        this.down_x = x;
-        this.down_y = y;
+        // System.out.println(p);
+        this.onDown(x, y);
         return true;
-      }
-      case MotionEvent.ACTION_UP: {
-        if (this.current != null) {
-          if (m.getOrientation(current) == Direction.VERTICAL) { help_move(down_y, y); } else { help_move(down_x, x); }
-          this.current = null;
-        }
+      } case MotionEvent.ACTION_MOVE: {
+        this.onMove(x, y);
+        return true;
+      } case MotionEvent.ACTION_UP: {
+        this.onUp();
         return true;
       }
       default: {

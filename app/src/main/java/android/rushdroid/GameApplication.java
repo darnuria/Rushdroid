@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by darnuria on 2/21/16.
+ * Created by Axel on 2/21/16.
  * Save the state of the game.
  */
 public class GameApplication extends Application {
