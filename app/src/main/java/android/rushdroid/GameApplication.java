@@ -30,6 +30,8 @@ public class GameApplication extends Application {
 
   public int size() { return games.size(); }
 
+  public int puzzle_number(Model m) { return games.indexOf(m); }
+
   @Override
   public void onCreate() {
     AssetManager am = this.getApplicationContext().getAssets();

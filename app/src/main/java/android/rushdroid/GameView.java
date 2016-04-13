@@ -32,7 +32,7 @@ final public class GameView extends SurfaceView {
   private final int[] ys = new int[game_height];
   private Integer current = null;
   private final Model m;
-  private final Bitmap[] bitmaps = new Bitmap[4];
+  private final Bitmap[] bitmaps = new Bitmap[6];
   private int down_x;
   private int down_y;
 
@@ -51,6 +51,8 @@ final public class GameView extends SurfaceView {
     this.bitmaps[1] = BitmapFactory.decodeResource(getResources(), R.drawable.vertical3);
     this.bitmaps[2] = BitmapFactory.decodeResource(getResources(), R.drawable.horizontal2);
     this.bitmaps[3] = BitmapFactory.decodeResource(getResources(), R.drawable.horizontal3);
+    this.bitmaps[4] = BitmapFactory.decodeResource(getResources(), R.drawable.main_block);
+    this.bitmaps[5] = BitmapFactory.decodeResource(getResources(), R.drawable.background);
     this.m = ((GameApplication) context.getApplicationContext()).game();
 
     getHolder().addCallback(new SurfaceHolder.Callback() {
@@ -105,6 +107,8 @@ final public class GameView extends SurfaceView {
     c.drawLine(X - 1, 0, X - 1, X - 1, p);
   }
 
+  private Bitmap help_draw (int id) { if (id == 0) { return this.bitmaps[4]; } else {return this.bitmaps[2]; } }
+
   /**
    * This function draw all the game state for each frame.
    * It will be called from the game thread.
@@ -121,22 +125,20 @@ final public class GameView extends SurfaceView {
         int x2 = (xp + 1) * ratioX;
         int y2 = (yp + p.getSize()) * ratioY;
         Bitmap bitmap = (p.getSize() == 2) ? (this.bitmaps[0]) : (this.bitmaps[1]);
-        c.drawBitmap(bitmap, null, new RectF(xp * ratioX, yp * ratioY, x2, y2), null);
+        c.drawBitmap(bitmap, null, new RectF(xp * ratioX + 1, yp * ratioY + 1, x2, y2), null);
       } else {
         int x2 = (xp + p.getSize()) * ratioX;
         int y2 = (yp + 1) * ratioY;
-        Bitmap bitmap = (p.getSize() == 2) ? (this.bitmaps[2]) : (this.bitmaps[3]);
-        c.drawBitmap(bitmap, null, new RectF(xp * ratioX, yp * ratioY, x2, y2), null);
+        Bitmap bitmap = (p.getSize() == 2) ? (help_draw(p.getId())) : (this.bitmaps[3]);
+        c.drawBitmap(bitmap, null, new RectF(xp * ratioX + 1, yp * ratioY + 2, x2, y2), null);
       }
     }
-    drawGrid(c);
   }
 
   @Override
   public void onDraw(@NonNull Canvas c) {
     if (!m.endOfGame()) {
-      c.drawColor(Color.BLACK);
-      drawGrid(c);
+      c.drawBitmap(this.bitmaps[5], null, new RectF(0, 0, surface_width, surface_height), null);
       drawGame(c, m.pieces());
     } else {
       c.drawColor(Color.BLACK);

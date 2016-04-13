@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.rushdroid.model.Model;
 import android.view.View;
+import android.widget.TextView;
 
 
 // TODO: Add managing of pause etc...
@@ -20,6 +21,11 @@ public class GameActivity extends Activity {
     this.game = ((GameApplication) this.getApplication()).game();
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_game);
+    TextView tv = (TextView) findViewById(R.id.textView);
+    Integer lvl = ((GameApplication) this.getApplication()).puzzle_number(this.game);
+    if (tv != null){
+      tv.setText("Niveau " + lvl);
+    }
   }
 
   public void onClickRedo(View v) {

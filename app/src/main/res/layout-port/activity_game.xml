@@ -5,19 +5,38 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="bottom">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Rushdroid"
+        android:id="@+id/textView"
+        android:layout_gravity="center"
+        android:layout_weight=".1"
+        android:gravity="center_vertical|center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:textColor="#000000"
+        android:height="30dp"/>
+
     <android.rushdroid.GameView
         android:layout_width="fill_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/gameView"
-        android:layout_marginLeft="0dp"
-        android:layout_marginTop="50dp" />
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="0dp"
+        android:layout_weight=".70"
+        android:layout_marginRight="5dp"/>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:weightSum="1"
-        android:gravity="center_horizontal">
+        android:gravity="center_vertical|center_horizontal"
+        android:layout_weight=".09"
+        >
 
         <Button
             android:layout_width="wrap_content"
@@ -35,12 +54,12 @@
             android:onClick="onClickUndo"
             android:nestedScrollingEnabled="true"
             android:layout_marginRight="0dp"
-            android:layout_gravity="right" />
+            />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="clear"
+            android:text="reset"
             android:id="@+id/button3"
             android:onClick="onClickClear"
             />
